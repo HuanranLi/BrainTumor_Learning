@@ -47,7 +47,7 @@ def CL_evaluate_model(model, data_loader, loss_function, device):
 train_hyperparams = {
     'batch_size': 128,
     'learning_rate': 0.001,
-    'num_epochs': 100,
+    'num_epochs': 5,
     'resize': (224, 224),
     'normalize_means': (0.5, 0.5, 0.5),
     'normalize_stds': (0.5, 0.5, 0.5),
@@ -142,7 +142,7 @@ def evaluate_model(data_loader, CL_model, FT_model, device, criterion):
 tune_hyperparams = {
     'batch_size': 32,
     'learning_rate': 0.001,
-    'num_epochs': 100,
+    'num_epochs': 5,
     'resize': (224, 224),
     'normalize_means': (0.5, 0.5, 0.5),
     'normalize_stds': (0.5, 0.5, 0.5),
