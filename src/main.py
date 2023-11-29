@@ -8,10 +8,7 @@ from CL import *
 import torch.nn as nn
 import torchvision.models as models
 
-###################################
-###### Train CL
-###################################
-
+print("Loading and preprocessing data...")
 
 base_transform = transforms.Compose([
     transforms.Resize((224, 224)),
@@ -21,26 +18,28 @@ base_transform = transforms.Compose([
 
 batch_size = 128
 
-train_dataset = datasets.ImageFolder(root='./brain_tumor/Training', transform=base_transform)
+train_dataset = datasets.ImageFolder(root='../dataset/brain_tumor/Training', transform=base_transform)
 train_loader_CL = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, collate_fn=CL_collate)
 
-test_dataset = datasets.ImageFolder(root='./brain_tumor/Testing', transform=base_transform)
+test_dataset = datasets.ImageFolder(root='../dataset/brain_tumor/Testing', transform=base_transform)
 test_loader_CL = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=True, collate_fn=CL_collate)
 
+print("Data loaded and preprocessed.")
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+print("Setting up the model...")
 model = models.resnet18(weights=None)
 model.to(device)
 num_ftrs = model.fc.in_features #512
 model.fc = nn.Flatten()
-
+print(f"Model setup complete. Model moved to device: {device}")
 
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 loss_function = InfoNCELoss(temperature=1)
 train_epochs = 5
 
-
+print("Starting contrastive learning training...")
 model.train()
 for epoch in range(train_epochs):
     running_loss = 0.0
@@ -54,18 +53,14 @@ for epoch in range(train_epochs):
         optimizer.step()
         running_loss += loss.item()
     print(f'Epoch {epoch+1}/{train_epochs} finished. Training Loss: {running_loss}')
+print("Contrastive learning training complete.")
 
+print("Starting fine-tuning...")
 
-
-###################################
-###### Fine-Tune CL
-###################################
-
-
-train_dataset = datasets.ImageFolder(root='./brain_tumor/Training', transform=base_transform)
+train_dataset = datasets.ImageFolder(root='../dataset/brain_tumor/Training', transform=base_transform)
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
-test_dataset = datasets.ImageFolder(root='./brain_tumor/Testing', transform=base_transform)
+test_dataset = datasets.ImageFolder(root='../dataset/brain_tumor/Testing', transform=base_transform)
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 classifier = nn.Linear(256, 4).to(device)
@@ -77,8 +72,7 @@ tune_epochs = 10
 # Classifier training loop
 classifier.train()
 for epoch in range(tune_epochs):
-
-    for images, labels in train_loader_FT:
+    for images, labels in train_loader:
         images, labels = images.to(device), labels.to(device)
 
         # Forward pass to get representations
@@ -93,18 +87,16 @@ for epoch in range(tune_epochs):
         classifier_optimizer.zero_grad()
         loss.backward()
         classifier_optimizer.step()
+        print(f'Epoch {epoch+1}/{tune_epochs}, Loss: {loss.item()}')
+print("Fine-tuning complete.")
 
-
-
-###################################
-###### Test
-###################################
+print("Starting testing...")
 
 # Validation loop
 correct = 0
 total = 0
 with torch.no_grad():
-    for images, labels in labeled_val_loader:
+    for images, labels in test_loader:
         images, labels = images.to(device), labels.to(device)
 
         representations = model(images)
