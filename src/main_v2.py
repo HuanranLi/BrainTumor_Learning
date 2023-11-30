@@ -111,7 +111,7 @@ def FT_train_one_epoch(train_loader, CL_model, FT_model, device, criterion, opti
     return running_loss
 
 
-def evaluate_model(data_loader, CL_model, FT_model, device, criterion):
+def FT_evaluate_model(data_loader, CL_model, FT_model, device, criterion):
     FT_model.eval()  # Set the model to evaluation mode
     correct = 0
     total = 0
@@ -165,7 +165,7 @@ for epoch in range(tune_hyperparams['num_epochs']):
     print(f'Epoch {epoch}, Loss: {loss.item()}')
     writer.add_scalar('FT_Loss/Train', train_loss, epoch)
 
-    accuracy, avg_loss = evaluate_model(FT['test_loader'], CL['model'], FT['model'], FT['device'], FT['loss_function'])
+    accuracy, avg_loss = FT_evaluate_model(FT['test_loader'], CL['model'], FT['model'], FT['device'], FT['loss_function'])
     print(f'Evaluation Accuracy: {accuracy}%, Average Loss: {avg_loss}')
     writer.add_scalar('FT_Loss/Test', avg_loss, epoch)
     writer.add_scalar('FT_Accuracy/Test', accuracy, epoch)
