@@ -61,10 +61,9 @@ def setup_model(hyperparams):
         model = models.resnet18(weights=None)
         model.fc = nn.Flatten()
     elif model_name == '3_layer_FFN':
-        # Define input_size, hidden_size, and num_classes as per your requirements
-        input_size = 512  # Example value
-        hidden_size = 256  # Example value
-        num_classes = 4  # Example value
+        input_size = 512
+        hidden_size = 256
+        num_classes = 4
         model = ThreeLayerFFN(input_size, hidden_size, num_classes)
     else:
         raise ValueError(f"Model {model_name} not supported.")
