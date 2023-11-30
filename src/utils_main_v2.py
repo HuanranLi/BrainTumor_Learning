@@ -64,7 +64,7 @@ def setup_model(hyperparams):
         # Define input_size, hidden_size, and num_classes as per your requirements
         input_size = 512  # Example value
         hidden_size = 256  # Example value
-        num_classes = 10  # Example value
+        num_classes = 4  # Example value
         model = ThreeLayerFFN(input_size, hidden_size, num_classes)
     else:
         raise ValueError(f"Model {model_name} not supported.")
