@@ -19,8 +19,8 @@ def CL_train_one_epoch(model, train_loader, optimizer, loss_function, device):
     running_loss = 0.0
     for i, (img1, img2) in enumerate(train_loader):
         optimizer.zero_grad()
-        embeddings1 = model(img1).to(device)
-        embeddings2 = model(img2).to(device)
+        embeddings1 = model(img1.to(device) )
+        embeddings2 = model(img2.to(device) )
 
         loss = loss_function(embeddings1, embeddings2)  # Calculate contrastive loss
         loss.backward()
@@ -35,8 +35,8 @@ def CL_evaluate_model(model, data_loader, loss_function, device):
     running_loss = 0.0
     with torch.no_grad():  # Disable gradient computation
         for i, (img1, img2) in enumerate(data_loader):
-            embeddings1 = model(img1).to(device)
-            embeddings2 = model(img2).to(device)
+            embeddings1 = model(img1.to(device) )
+            embeddings2 = model(img2.to(device) )
 
             loss = loss_function(embeddings1, embeddings2)  # Calculate contrastive loss
             running_loss += loss.item()
@@ -70,6 +70,7 @@ CL['optimizer'], CL['loss_function'] = init_optimizer_loss(train_hyperparams, CL
 
 # Training & Evaluation
 for epoch in range(train_hyperparams['num_epochs']):
+    print(f'Training epoch {epoch}')
     train_loss = CL_train_one_epoch(CL['model'],
                                     CL['train_loader'],
                                     CL['optimizer'],
