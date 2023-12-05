@@ -162,8 +162,8 @@ FT['optimizer'], FT['loss_function'] = init_optimizer_loss(tune_hyperparams, FT[
 
 # Classifier training loop
 for epoch in range(tune_hyperparams['num_epochs']):
-    FT_train_one_epoch(FT['train_loader'], CL['model'], FT['model'], FT['device'], FT['loss_function'], FT['optimizer'])
-    print(f'Epoch {epoch}, Loss: {loss.item()}')
+    train_loss = FT_train_one_epoch(FT['train_loader'], CL['model'], FT['model'], FT['device'], FT['loss_function'], FT['optimizer'])
+    print(f'Epoch {epoch}, Loss: {train_loss}')
     writer.add_scalar('FT_Loss/Train', train_loss, epoch)
 
     accuracy, avg_loss = FT_evaluate_model(FT['test_loader'], CL['model'], FT['model'], FT['device'], FT['loss_function'])
