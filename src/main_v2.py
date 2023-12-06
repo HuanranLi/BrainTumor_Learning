@@ -46,7 +46,7 @@ def CL_evaluate_model(model, data_loader, loss_function, device):
 # Default Hyperparameters
 train_hyperparams = {
     'batch_size': 128,
-    'learning_rate': 0.001,
+    'learning_rate': 0.01,
     'num_epochs': 200,
     'resize': (224, 224),
     'normalize_means': (0.5, 0.5, 0.5),
