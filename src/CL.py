@@ -25,9 +25,9 @@ class ContrastiveCNN(nn.Module):
             # Now define the rest of your layers using the calculated flattened_feature_size
             self.fc1 = nn.Linear(self.flattened_feature_size, 512)
             self.projection_head = nn.Sequential(
-                nn.Linear(512, 256),  
+                nn.Linear(512, 256),
                 nn.ReLU(),
-                nn.Linear(256, 128)   
+                nn.Linear(256, 128)
             )
 
     def forward(self, x):
@@ -46,7 +46,7 @@ class InfoNCELoss(nn.Module):
     def __init__(self, temperature=1):
         super(InfoNCELoss, self).__init__()
         self.temperature = temperature
-    
+
     def forward(self, z_i, z_j):
         z_i = F.normalize(z_i, p=2, dim=1)
         z_j = F.normalize(z_j, p=2, dim=1)
@@ -78,11 +78,11 @@ class InfoNCELoss(nn.Module):
         # Check for NaN values
         if torch.isnan(logits).any() or torch.isinf(logits).any():
             raise ValueError("NaN/inf values detected in logits")
-        
+
         loss = F.cross_entropy(logits, labels, reduction='sum') / (2 * batch_size)
 
         return loss
-    
+
 class ContrastiveTransform:
     def __init__(self, base_transform):
         self.base_transform = base_transform
@@ -132,4 +132,15 @@ def CL_collate(batch):
 
 
     return augmented_inputs1, augmented_inputs2
+
+def sup_CL_collate(batch):
+    input_data_list, label_list = zip(*batch)
+
+    # Concatenate input data along the batch dimension
+    input_data_list = RandomCrop_data(input_data_list)
+    input_data_list = GaussBlur_data(input_data_list)
+
     
+
+
+    return augmented_inputs1, augmented_inputs2
