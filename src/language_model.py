@@ -15,6 +15,11 @@ current_directory = os.path.abspath(os.path.dirname(__file__))
 os.environ['TORCH_HOME'] = current_directory
 
 
+# Set the TRANSFORMERS_CACHE environment variable to a subdirectory in the current directory
+transformers_cache_path = os.path.join(current_directory, "transformers_cache")
+os.makedirs(transformers_cache_path, exist_ok=True)
+os.environ['TRANSFORMERS_CACHE'] = transformers_cache_path
+
 import torch
 import torch.nn as nn
 from torchvision.models import resnet18
