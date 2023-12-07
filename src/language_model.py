@@ -7,6 +7,14 @@ import torch
 from nltk.translate.bleu_score import corpus_bleu
 
 
+
+import os
+# Get the absolute path of the current directory
+current_directory = os.path.abspath(os.path.dirname(__file__))
+# Set the TORCH_HOME environment variable to the current directory
+os.environ['TORCH_HOME'] = current_directory
+
+
 import torch
 import torch.nn as nn
 from torchvision.models import resnet18
