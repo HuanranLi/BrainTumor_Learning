@@ -4,6 +4,7 @@ import torch.optim as optim
 import torch.nn as nn
 from torchvision import datasets, transforms, models
 from CL import *
+import random
 
 
 # Define a 3-layer Feedforward Neural Network
@@ -24,9 +25,34 @@ class ThreeLayerFFN(nn.Module):
         return out
 
 
+def sample_dataset(dataset, percentage):
+    # Ensure the percentage is between 0 and 1
+    percentage = max(0, min(percentage, 1))
+
+    # Get class indices
+    class_to_indices = dataset.class_to_idx
+    indices_to_class = {v: k for k, v in class_to_indices.items()}
+
+    # Sample data
+    sampled_indices = []
+    for class_idx in class_to_indices.values():
+        class_indices = [i for i, label in enumerate(dataset.targets) if label == class_idx]
+        k = int(len(class_indices) * percentage)
+        sampled_indices.extend(random.sample(class_indices, k))
+
+    # Subset dataset
+    sampled_dataset = torch.utils.data.Subset(dataset, sampled_indices)
+
+    return sampled_dataset
+
+# Example Usage
+# dataset = ImageFolder(root=hyperparams['train_dataset_dir'], transform=base_transform)
+# sampled_dataset = sample_dataset(dataset, 0.2)  # Sample 20% of data from each class
+
+
 
 # Load and preprocess data
-def load_data(hyperparams, CL = False):
+def load_data(hyperparams, CL = False, sample_rate = 1):
     print("Loading and preprocessing data...")
 
     base_transform = transforms.Compose([
@@ -36,6 +62,8 @@ def load_data(hyperparams, CL = False):
     ])
 
     train_dataset = datasets.ImageFolder(root=hyperparams['train_dataset_dir'], transform=base_transform)
+    if sample_rate < 1:
+        train_dataset = sample_dataset(train_dataset, percentage)
     if CL:
         train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=hyperparams['batch_size'], shuffle=True, collate_fn=CL_collate)
     else:
