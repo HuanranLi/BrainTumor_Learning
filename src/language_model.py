@@ -146,6 +146,8 @@ for epoch in range(epochs):
     references = []
     # Model inference
     for images, true_texts in test_loader:
+        image = image.to(device)
+        true_texts = true_texts.to(device)
         with torch.no_grad():
             outputs = model(images)
             logits = outputs.logits
