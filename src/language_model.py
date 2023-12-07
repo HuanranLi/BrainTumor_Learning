@@ -13,12 +13,7 @@ import os
 current_directory = os.path.abspath(os.path.dirname(__file__))
 # Set the TORCH_HOME environment variable to the current directory
 os.environ['TORCH_HOME'] = current_directory
-
-
-# Set the TRANSFORMERS_CACHE environment variable to a subdirectory in the current directory
-transformers_cache_path = os.path.join(current_directory, "transformers_cache")
-os.makedirs(transformers_cache_path, exist_ok=True)
-os.environ['TRANSFORMERS_CACHE'] = transformers_cache_path
+os.environ['TRANSFORMERS_CACHE'] = current_directory
 
 import torch
 import torch.nn as nn
