@@ -159,6 +159,10 @@ for epoch in range(epochs):
 
         # Store references for BLEU calculation
         references.extend([tokenizer.decode(tokenizer.encode(f"This is an MRI image with {t}."), skip_special_tokens=True) for t in true_texts])
+
+        print("Generated:", generated_text)
+        print("Reference:", references)
+        
     bleu_score = corpus_bleu([[ref.split()] for ref in references], [gen.split() for gen in generated_texts])
     print(f"BLEU Score: {bleu_score}")
 
