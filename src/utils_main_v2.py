@@ -90,7 +90,8 @@ def setup_model(hyperparams):
         model.fc = nn.Flatten()
     elif model_name == 'sup_resnet18':
         # Modify the final fully connected layer
-        model = models.resnet18(pretrained=True)
+        #model = models.resnet18(pretrained=True)
+        model = models.resnet18(weights=None)
         num_features = model.fc.in_features
         model.fc = nn.Linear(num_features, 4)  # 4 classes
     elif model_name == '3_layer_FFN':
