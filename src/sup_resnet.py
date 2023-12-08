@@ -90,12 +90,6 @@ FT['optimizer'], FT['loss_function'] = init_optimizer_loss(tune_hyperparams, FT[
 for epoch in range(tune_hyperparams['num_epochs']):
     train_loss = train_one_epoch(FT['train_loader'], FT['model'], FT['device'], FT['loss_function'], FT['optimizer'])
     print(f'Epoch {epoch}, Loss: {train_loss}')
-    writer.add_scalar('FT_Loss/Train', train_loss, epoch)
 
     accuracy, avg_loss = evaluate_model(FT['test_loader'], FT['model'], FT['device'], FT['loss_function'])
     print(f'Evaluation Accuracy: {accuracy}%, Average Loss: {avg_loss}')
-    writer.add_scalar('FT_Loss/Test', avg_loss, epoch)
-    writer.add_scalar('FT_Accuracy/Test', accuracy, epoch)
-
-
-writer.close()
