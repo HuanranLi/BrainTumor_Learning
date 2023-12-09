@@ -80,7 +80,7 @@ tune_hyperparams = {
     'test_dataset_dir': '../dataset/brain_tumor/Testing',
 }
 FT = {}
-FT['train_loader'], FT['test_loader'] = load_data(tune_hyperparams, CL = False, sample_rate = 0.1)
+FT['train_loader'], FT['test_loader'] = load_data(tune_hyperparams, CL = False, sample_rate = 0.3)
 FT['model'], FT['device'] = setup_model(tune_hyperparams)
 FT['optimizer'], FT['loss_function'] = init_optimizer_loss(tune_hyperparams, FT['model'])
 
