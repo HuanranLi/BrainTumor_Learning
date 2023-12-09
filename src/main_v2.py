@@ -13,6 +13,14 @@ from datetime import datetime
 from utils_main_v2 import *
 
 
+import os
+# Get the absolute path of the current directory
+current_directory = os.path.abspath(os.path.dirname(__file__))
+# Set the TORCH_HOME environment variable to the current directory
+os.environ['TORCH_HOME'] = current_directory
+
+
+
 def CL_train_one_epoch(model, train_loader, optimizer, loss_function, device):
     model.train()
 
