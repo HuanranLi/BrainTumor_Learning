@@ -64,6 +64,8 @@ def evaluate_model(data_loader, model, device, criterion):
     avg_loss = total_loss / len(data_loader)
     return accuracy, avg_loss
 
+sample_rate = (int(sys.argv[1]) + 1)/10
+print(f'Sample Rate:', sample_rate)
 
 # Default Hyperparameters
 tune_hyperparams = {
@@ -80,7 +82,7 @@ tune_hyperparams = {
     'test_dataset_dir': '../dataset/brain_tumor/Testing',
 }
 FT = {}
-FT['train_loader'], FT['test_loader'] = load_data(tune_hyperparams, CL = False, sample_rate = 0.7)
+FT['train_loader'], FT['test_loader'] = load_data(tune_hyperparams, CL = False, sample_rate = sample_rate)
 FT['model'], FT['device'] = setup_model(tune_hyperparams)
 FT['optimizer'], FT['loss_function'] = init_optimizer_loss(tune_hyperparams, FT['model'])
 
