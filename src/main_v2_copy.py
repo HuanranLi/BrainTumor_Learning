@@ -10,7 +10,7 @@ import torchvision.models as models
 from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
 
-from utils_main_v2_copy import *
+from utils_main_v2 import *
 
 
 import os
@@ -100,22 +100,23 @@ print("Contrastive learning training complete.")
 
 
 
-def FT_train_one_epoch(train_loader, CL_model, FT_model, device, criterion, optimizer):
+def FT_train_one_epoch(train_loader, CL_model, FT_model, device, criterion, optimizer, CL_optimizer):
     FT_model.train()  # Set the fine-tuning model to training mode
 
     running_loss = 0
     for images, labels in train_loader:
         images, labels = images.to(device), labels.to(device)
 
-        with torch.no_grad():
-            representations = CL_model(images)
-
+        representations = CL_model(images)
         outputs = FT_model(representations)
         loss = criterion(outputs, labels)  # Calculate classification loss
 
         optimizer.zero_grad()
+        CL_optimizer.zero_grad()
+
         loss.backward()
         optimizer.step()
+        CL_optimizer.step()
 
         running_loss += loss
 
@@ -172,7 +173,7 @@ FT['optimizer'], FT['loss_function'] = init_optimizer_loss(tune_hyperparams, FT[
 
 # Classifier training loop
 for epoch in range(tune_hyperparams['num_epochs']):
-    train_loss = FT_train_one_epoch(FT['train_loader'], CL['model'], FT['model'], FT['device'], FT['loss_function'], FT['optimizer'])
+    train_loss = FT_train_one_epoch(FT['train_loader'], CL['model'], FT['model'], FT['device'], FT['loss_function'], FT['optimizer'], CL['optimizer'])
     print(f'Epoch {epoch}, Loss: {train_loss}')
     writer.add_scalar('FT_Loss/Train', train_loss, epoch)
 
