@@ -55,7 +55,7 @@ print('Learning Rate:', learning_rate)
 
 # Default Hyperparameters
 train_hyperparams = {
-    'batch_size': 1024,
+    'batch_size': 512,
     'learning_rate': learning_rate,
     'num_epochs': 200,
     'resize': (224, 224),
