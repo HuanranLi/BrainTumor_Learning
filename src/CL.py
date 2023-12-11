@@ -111,6 +111,15 @@ def RandomCrop_data(inputs):
     augmented_inputs = torch.stack([augmentation(img) for img in inputs])
     return augmented_inputs
 
+def H_flip(inputs):
+    augmentation = transforms.Compose([
+        transforms.ToPILImage(),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+    ])
+
+    augmented_inputs = torch.stack([augmentation(img) for img in inputs])
+    return augmented_inputs
 
 def GaussBlur_data(inputs):
 
@@ -133,14 +142,13 @@ def CL_collate(batch):
 
     return augmented_inputs1, augmented_inputs2
 
-def sup_CL_collate(batch):
+
+def CL_collate_v2(batch):
     input_data_list, label_list = zip(*batch)
 
     # Concatenate input data along the batch dimension
-    input_data_list = RandomCrop_data(input_data_list)
-    input_data_list = GaussBlur_data(input_data_list)
-
-    
+    augmented_inputs1 = RandomCrop_data(input_data_list)
+    augmented_inputs2 = H_flip(input_data_list)
 
 
     return augmented_inputs1, augmented_inputs2
