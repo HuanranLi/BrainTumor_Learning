@@ -51,8 +51,8 @@ def CL_evaluate_model(model, data_loader, loss_function, device):
 
     return running_loss
 
-sample_rate =  int(sys.argv[1] + 1) / 10
-print('sample_rate:', sample_rate)
+sample_rate = (int(sys.argv[1]) + 1)/10
+print(f'Sample Rate:', sample_rate)
 
 # Default Hyperparameters
 train_hyperparams = {
