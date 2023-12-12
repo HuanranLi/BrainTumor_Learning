@@ -50,13 +50,14 @@ def CL_evaluate_model(model, data_loader, loss_function, device):
             running_loss += loss.item()
 
     return running_loss
-learning_rate = 10**(-1 * int(sys.argv[1]))
-print('Learning Rate:', learning_rate)
+
+sample_rate =  int(sys.argv[1] + 1) / 10
+print('sample_rate:', sample_rate)
 
 # Default Hyperparameters
 train_hyperparams = {
-    'batch_size': 512,
-    'learning_rate': learning_rate,
+    'batch_size': 128,
+    'learning_rate': 1e-4,
     'num_epochs': 200,
     'resize': (224, 224),
     'normalize_means': (0.5, 0.5, 0.5),
@@ -165,7 +166,7 @@ tune_hyperparams = {
     'test_dataset_dir': '../dataset/brain_tumor/Testing',
 }
 FT = {}
-FT['train_loader'], FT['test_loader'] = load_data(tune_hyperparams, CL = False, sample_rate = 1)
+FT['train_loader'], FT['test_loader'] = load_data(tune_hyperparams, CL = False, sample_rate = sample_rate)
 FT['model'], FT['device'] = setup_model(tune_hyperparams)
 FT['optimizer'], FT['loss_function'] = init_optimizer_loss(tune_hyperparams, FT['model'])
 

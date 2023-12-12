@@ -101,6 +101,7 @@ def setup_model(hyperparams):
         hidden_size = 256
         num_classes = 4
         model = ThreeLayerFFN(input_size, hidden_size, num_classes)
+
     elif model_name == 'SimpleCNN':
         model = ContrastiveCNN()
     elif model_name == '3_layer_FFN_simple':
