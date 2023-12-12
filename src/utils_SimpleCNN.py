@@ -4,6 +4,7 @@ import torch.optim as optim
 import torch.nn as nn
 from torchvision import datasets, transforms, models
 from CL import *
+from SimpleCNN import *
 import random
 
 
@@ -107,6 +108,8 @@ def setup_model(hyperparams):
         hidden_size = 56
         num_classes = 4
         model = ThreeLayerFFN(input_size, hidden_size, num_classes)
+    elif model_name == 'sup_SimpleCNN':
+        model = SimpleCNN()
     else:
         raise ValueError(f"Model {model_name} not supported.")
 
