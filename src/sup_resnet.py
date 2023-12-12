@@ -70,8 +70,8 @@ print(f'Sample Rate:', sample_rate)
 # Default Hyperparameters
 tune_hyperparams = {
     'batch_size': 32,
-    'learning_rate': 0.01,
-    'num_epochs': 200,
+    'learning_rate': 0.001,
+    'num_epochs': 50,
     'resize': (224, 224),
     'normalize_means': (0.5, 0.5, 0.5),
     'normalize_stds': (0.5, 0.5, 0.5),
