@@ -108,15 +108,17 @@ def FT_train_one_epoch(train_loader, CL_model, FT_model, device, criterion, opti
     for images, labels in train_loader:
         images, labels = images.to(device), labels.to(device)
 
-        representations = CL_model(images)
+        with torch.no_grad():
+            representations = CL_model(images)
+
         outputs = FT_model(representations)
         loss = criterion(outputs, labels)  # Calculate classification loss
 
         optimizer.zero_grad()
-        CL_optimizer.zero_grad()
+        #CL_optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        CL_optimizer.step()
+        #CL_optimizer.step()
 
         running_loss += loss
 
