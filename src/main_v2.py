@@ -50,14 +50,15 @@ def CL_evaluate_model(model, data_loader, loss_function, device):
             running_loss += loss.item()
 
     return running_loss
-learning_rate = 10**(-1 * int(sys.argv[1]))
-print('Learning Rate:', learning_rate)
+
+sample_rate = (int(sys.argv[1]) + 1)/10
+print(f'Sample Rate:', sample_rate)
 
 # Default Hyperparameters
 train_hyperparams = {
-    'batch_size': 512,
-    'learning_rate': learning_rate,
-    'num_epochs': 200,
+    'batch_size': 128,
+    'learning_rate': 1e-4,
+    'num_epochs': 50,
     'resize': (224, 224),
     'normalize_means': (0.5, 0.5, 0.5),
     'normalize_stds': (0.5, 0.5, 0.5),
@@ -100,22 +101,22 @@ print("Contrastive learning training complete.")
 
 
 
-def FT_train_one_epoch(train_loader, CL_model, FT_model, device, criterion, optimizer):
+def FT_train_one_epoch(train_loader, CL_model, FT_model, device, criterion, optimizer, CL_optimizer):
     FT_model.train()  # Set the fine-tuning model to training mode
 
     running_loss = 0
     for images, labels in train_loader:
         images, labels = images.to(device), labels.to(device)
 
-        with torch.no_grad():
-            representations = CL_model(images)
-
+        representations = CL_model(images)
         outputs = FT_model(representations)
         loss = criterion(outputs, labels)  # Calculate classification loss
 
         optimizer.zero_grad()
+        CL_optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        CL_optimizer.step()
 
         running_loss += loss
 
@@ -153,7 +154,7 @@ def FT_evaluate_model(data_loader, CL_model, FT_model, device, criterion):
 tune_hyperparams = {
     'batch_size': 32,
     'learning_rate': 0.01,
-    'num_epochs': 200,
+    'num_epochs': 50,
     'resize': (224, 224),
     'normalize_means': (0.5, 0.5, 0.5),
     'normalize_stds': (0.5, 0.5, 0.5),
@@ -164,7 +165,7 @@ tune_hyperparams = {
     'test_dataset_dir': '../dataset/brain_tumor/Testing',
 }
 FT = {}
-FT['train_loader'], FT['test_loader'] = load_data(tune_hyperparams, CL = False, sample_rate = 1)
+FT['train_loader'], FT['test_loader'] = load_data(tune_hyperparams, CL = False, sample_rate = sample_rate)
 FT['model'], FT['device'] = setup_model(tune_hyperparams)
 FT['optimizer'], FT['loss_function'] = init_optimizer_loss(tune_hyperparams, FT['model'])
 
@@ -172,7 +173,7 @@ FT['optimizer'], FT['loss_function'] = init_optimizer_loss(tune_hyperparams, FT[
 
 # Classifier training loop
 for epoch in range(tune_hyperparams['num_epochs']):
-    train_loss = FT_train_one_epoch(FT['train_loader'], CL['model'], FT['model'], FT['device'], FT['loss_function'], FT['optimizer'])
+    train_loss = FT_train_one_epoch(FT['train_loader'], CL['model'], FT['model'], FT['device'], FT['loss_function'], FT['optimizer'], CL['optimizer'])
     print(f'Epoch {epoch}, Loss: {train_loss}')
     writer.add_scalar('FT_Loss/Train', train_loss, epoch)
 
