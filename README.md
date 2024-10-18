@@ -27,8 +27,8 @@ python main.py
 
 ### Setup
 We conducted experiments using two distinct backbone architectures: a shallow 4-layer CNN and a deep, pre-trained ResNet18. Both architectures utilized the same hyperparameters for consistency in evaluation:
-- **Contrastive Learning Phase**: Batch Size = 128, 100 Training Epochs, Learning Rate = \( 1 \times 10^{-4} \)
-- **Fine-Tuning Phase**: Batch Size = 30, 50 Training Epochs, Learning Rate = \( 1 \times 10^{-3} \)
+- **Contrastive Learning Phase**: Batch Size = 128, 100 Training Epochs, Learning Rate = 0.0001
+- **Fine-Tuning Phase**: Batch Size = 30, 50 Training Epochs, Learning Rate = 0.001
 
 We employed data augmentation techniques during the contrastive learning phase. Extensive testing revealed that a combination of Random Crop and Gaussian Blur provided optimal results. Below is the validation accuracy for different augmentation combinations on the shallow CNN model:
 
