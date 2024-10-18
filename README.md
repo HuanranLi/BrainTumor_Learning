@@ -42,7 +42,7 @@ We employed data augmentation techniques during the contrastive learning phase. 
 | **Blur**       | **Crop**       | **96.03%**          |
 
 ### Shallow 4-layer CNN Results
-The shallow CNN model showed consistent improvements in test accuracy as the label sample rate increased. Notably, the contrastive learning method outperformed traditional supervised learning at nearly every label sample rate, highlighting the advantage of leveraging unlabeled data in low-label settings.
+The shallow CNN model showed consistent improvements in test accuracy as the label sample rate increased. Notably, the contrastive learning method outperformed traditional supervised learning at nearly every label sample rate.
 
 ![Test Accuracy vs. Label Sample Rate on Shallow CNN](Graphs/exp1.png)
 
