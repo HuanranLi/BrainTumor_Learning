@@ -3,8 +3,9 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 from torchvision import datasets, transforms, models
-from CL import *
 import random
+
+from CL import *
 
 
 # Define a 3-layer Feedforward Neural Network

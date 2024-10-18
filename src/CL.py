@@ -6,42 +6,6 @@ from torchvision import datasets
 from torchvision.transforms import transforms
 from PIL import Image
 
-class ContrastiveCNN(nn.Module):
-    def __init__(self):
-        super(ContrastiveCNN, self).__init__()
-        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1)
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
-        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
-
-        # Inside your __init__ method after defining the conv and pool layers
-        with torch.no_grad():
-            # Passing a dummy input through the conv and pool layers to calculate output size
-            dummy_input = torch.zeros(1, 3, 224, 224)  # Batch size of 1, 3 color channels, 224x224 image size
-            dummy_output = self.pool(self.conv2(self.pool(self.conv1(dummy_input))))
-            # The number of features is the product of the dimensions of the output from the conv layers
-            self.flattened_feature_size = dummy_output.size(1) * dummy_output.size(2) * dummy_output.size(3)
-
-
-            # Now define the rest of your layers using the calculated flattened_feature_size
-            self.fc1 = nn.Linear(self.flattened_feature_size, 512)
-            self.projection_head = nn.Sequential(
-                nn.Linear(512, 256),
-                nn.ReLU(),
-                nn.Linear(256, 128)
-            )
-
-    def forward(self, x):
-        x = F.relu(self.pool(self.conv1(x)))
-        x = F.relu(self.pool(self.conv2(x)))
-        x = x.view(x.size(0), -1)
-        # Make sure the flattened tensor has the correct size
-        assert x.size(1) == self.flattened_feature_size, f"Expected size {self.flattened_feature_size}, but got {x.size(1)}"
-        # Pass the flattened features through the first fully connected layer
-        x = F.relu(self.fc1(x))
-        # Pass the features through the projection head
-        embeddings = self.projection_head(x)
-        return embeddings
-
 class InfoNCELoss(nn.Module):
     def __init__(self, temperature=1):
         super(InfoNCELoss, self).__init__()
@@ -59,7 +23,6 @@ class InfoNCELoss(nn.Module):
         # Cosine similarity as dot product between normalized vectors
         representations = torch.cat([z_i, z_j], dim=0)
         similarity_matrix = F.cosine_similarity(representations.unsqueeze(1), representations.unsqueeze(0), dim=2)
-
 
         # Create the labels for the positive pairs (1s for positive, 0s for negative)
         batch_size = z_i.shape[0]
