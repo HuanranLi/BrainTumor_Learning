@@ -21,11 +21,3 @@ This repository implements a pipeline for brain tumor image classification using
 To run the training and evaluation process, execute:
 
 python main.py
-
-This script performs the following steps:
-
-	1.	Loads the datasets and applies transformations.
-	2.	Initializes the feature extractor model using ResNet18.
-	3.	Pre-trains the model with contrastive learning.
-	4.	Fine-tunes the classifier on the brain tumor dataset.
-	5.	Logs the results to TensorBoard.
