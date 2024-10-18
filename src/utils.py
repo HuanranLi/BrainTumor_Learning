@@ -6,6 +6,7 @@ from torchvision import datasets, transforms, models
 import random
 
 from ContrastiveLearning import *
+from models import *
 
 
 def sample_dataset(dataset, percentage):

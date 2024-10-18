@@ -19,53 +19,59 @@ current_directory = os.path.abspath(os.path.dirname(__file__))
 # Set the TORCH_HOME environment variable to the current directory
 os.environ['TORCH_HOME'] = current_directory
 
-sample_rate = 0.1
-print(f'Sample Rate:', sample_rate)
-
-# Default Hyperparameters
-train_hyperparams = {
-    'batch_size': 128,
-    'learning_rate': 1e-4,
-    'num_epochs': 5,
-    'resize': (224, 224),
-    'normalize_means': (0.5, 0.5, 0.5),
-    'normalize_stds': (0.5, 0.5, 0.5),
-    'temperature': 1,
-    'model': 'resnet18',
-    'optimizer': 'Adam',
-    'loss_function': 'InfoNCELoss',
-    'train_dataset_dir': '../dataset/brain_tumor/Training',
-    'test_dataset_dir': '../dataset/brain_tumor/Testing',
-}
-
-# Default Hyperparameters
-tune_hyperparams = {
-    'batch_size': 32,
-    'learning_rate': 0.01,
-    'num_epochs': 5,
-    'resize': (224, 224),
-    'normalize_means': (0.5, 0.5, 0.5),
-    'normalize_stds': (0.5, 0.5, 0.5),
-    'model': '3_layer_FFN',
-    'optimizer': 'Adam',
-    'loss_function': 'CrossEntropyLoss',
-    'train_dataset_dir': '../dataset/brain_tumor/Training',
-    'test_dataset_dir': '../dataset/brain_tumor/Testing',
-}
-
 current_time = datetime.now().strftime('%Y%m%d-%H%M%S')
 writer = SummaryWriter(f'../logs/{current_time}')
 
 def main():
-    CL_main(train_hyperparams)
-    TF_main(tune_hyperparams)
+    sample_rate = 0.1
+    print(f'Sample Rate:', sample_rate)
 
-def CL_main(train_hyperparams):
+    # Default Hyperparameters
+    train_hyperparams = {
+        'batch_size': 128,
+        'learning_rate': 1e-4,
+        'num_epochs': 1,
+        'resize': (224, 224),
+        'normalize_means': (0.5, 0.5, 0.5),
+        'normalize_stds': (0.5, 0.5, 0.5),
+        'temperature': 1,
+        'model': 'resnet18',
+        'optimizer': 'Adam',
+        'loss_function': 'InfoNCELoss',
+        'train_dataset_dir': '../dataset/brain_tumor/Training',
+        'test_dataset_dir': '../dataset/brain_tumor/Testing',
+    }
+
     # Model Init
     CL = {}
     CL['train_loader'], CL['test_loader'] = load_data(train_hyperparams, CL = True)
     CL['model'], CL['device'] = setup_model(train_hyperparams)
     CL['optimizer'], CL['loss_function'] = init_optimizer_loss(train_hyperparams, CL['model'])
+
+    # Default Hyperparameters
+    tune_hyperparams = {
+        'batch_size': 32,
+        'learning_rate': 0.01,
+        'num_epochs': 1,
+        'resize': (224, 224),
+        'normalize_means': (0.5, 0.5, 0.5),
+        'normalize_stds': (0.5, 0.5, 0.5),
+        'model': '3_layer_FFN',
+        'optimizer': 'Adam',
+        'loss_function': 'CrossEntropyLoss',
+        'train_dataset_dir': '../dataset/brain_tumor/Training',
+        'test_dataset_dir': '../dataset/brain_tumor/Testing',
+    }
+
+    FT = {}
+    FT['train_loader'], FT['test_loader'] = load_data(tune_hyperparams, CL = False, sample_rate = sample_rate)
+    FT['model'], FT['device'] = setup_model(tune_hyperparams)
+    FT['optimizer'], FT['loss_function'] = init_optimizer_loss(tune_hyperparams, FT['model'])
+
+    CL_main(train_hyperparams, CL)
+    TF_main(tune_hyperparams, FT, CL)
+
+def CL_main(train_hyperparams, CL):
 
     # Training & Evaluation
     for epoch in range(train_hyperparams['num_epochs']):
@@ -88,14 +94,7 @@ def CL_main(train_hyperparams):
     print("Contrastive learning training complete.")
 
 
-def TF_main(tune_hyperparams):
-    FT = {}
-    FT['train_loader'], FT['test_loader'] = load_data(tune_hyperparams, CL = False, sample_rate = sample_rate)
-    FT['model'], FT['device'] = setup_model(tune_hyperparams)
-    FT['optimizer'], FT['loss_function'] = init_optimizer_loss(tune_hyperparams, FT['model'])
-
-
-
+def TF_main(tune_hyperparams, FT, CL):
     # Classifier training loop
     for epoch in range(tune_hyperparams['num_epochs']):
         train_loss = FT_train_one_epoch(FT['train_loader'], CL['model'], FT['model'], FT['device'], FT['loss_function'], FT['optimizer'], CL['optimizer'])
