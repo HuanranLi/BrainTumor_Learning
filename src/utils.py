@@ -44,6 +44,7 @@ def load_data(hyperparams, CL = False, sample_rate = 1):
     train_dataset = datasets.ImageFolder(root=hyperparams['train_dataset_dir'], transform=base_transform)
     if sample_rate < 1:
         train_dataset = sample_dataset(train_dataset, sample_rate)
+
     if CL:
         train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=hyperparams['batch_size'], shuffle=True, collate_fn=CL_collate)
     else:
