@@ -5,25 +5,7 @@ import torch.nn as nn
 from torchvision import datasets, transforms, models
 import random
 
-from CL import *
-
-
-# Define a 3-layer Feedforward Neural Network
-class ThreeLayerFFN(nn.Module):
-    def __init__(self, input_size, hidden_size, num_classes):
-        super(ThreeLayerFFN, self).__init__()
-        self.fc1 = nn.Linear(input_size, hidden_size)
-        self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(hidden_size, hidden_size)
-        self.fc3 = nn.Linear(hidden_size, num_classes)
-
-    def forward(self, x):
-        out = self.fc1(x)
-        out = self.relu(out)
-        out = self.fc2(out)
-        out = self.relu(out)
-        out = self.fc3(out)
-        return out
+from ContrastiveLearning import *
 
 
 def sample_dataset(dataset, percentage):
@@ -45,10 +27,6 @@ def sample_dataset(dataset, percentage):
     sampled_dataset = torch.utils.data.Subset(dataset, sampled_indices)
 
     return sampled_dataset
-
-# Example Usage
-# dataset = ImageFolder(root=hyperparams['train_dataset_dir'], transform=base_transform)
-# sampled_dataset = sample_dataset(dataset, 0.2)  # Sample 20% of data from each class
 
 
 
@@ -83,17 +61,19 @@ def load_data(hyperparams, CL = False, sample_rate = 1):
 
 def setup_model(hyperparams):
     print("Setting up the model...")
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    if torch.cuda.is_available():
+        device = torch.device("cuda:0")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+    else:
+        device = torch.device("cpu")
 
     model_name = hyperparams['model']
     if model_name == 'resnet18':
-        # model = models.resnet18(weights=None)
         model = models.resnet18(pretrained=True)
         model.fc = nn.Flatten()
     elif model_name == 'sup_resnet18':
-        # Modify the final fully connected layer
         model = models.resnet18(pretrained=True)
-        #model = models.resnet18(weights=None)
         num_features = model.fc.in_features
         model.fc = nn.Linear(num_features, 4)  # 4 classes
     elif model_name == '3_layer_FFN':
@@ -115,7 +95,6 @@ def init_optimizer_loss(hyperparams, model):
     optimizer_name = hyperparams['optimizer']
     if optimizer_name == 'Adam':
         optimizer = optim.Adam(model.parameters(), lr=hyperparams['learning_rate'])
-    # Add more optimizers here as elif conditions
     else:
         raise ValueError(f"Optimizer {optimizer_name} not supported.")
 
@@ -124,7 +103,6 @@ def init_optimizer_loss(hyperparams, model):
         loss_function = InfoNCELoss(temperature=hyperparams['temperature'])
     elif loss_function_name == 'CrossEntropyLoss':
         loss_function = nn.CrossEntropyLoss()
-    # Add more loss functions here as elif conditions
     else:
         raise ValueError(f"Loss function {loss_function_name} not supported.")
 

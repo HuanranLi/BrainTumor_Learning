@@ -6,6 +6,37 @@ from torchvision import datasets
 from torchvision.transforms import transforms
 from PIL import Image
 
+
+def CL_train_one_epoch(model, train_loader, optimizer, loss_function, device):
+    model.train()
+
+    running_loss = 0.0
+    for i, (img1, img2) in enumerate(train_loader):
+        optimizer.zero_grad()
+        embeddings1 = model(img1.to(device) )
+        embeddings2 = model(img2.to(device) )
+
+        loss = loss_function(embeddings1, embeddings2)  # Calculate contrastive loss
+        loss.backward()
+        optimizer.step()
+        running_loss += loss.item()
+
+    return running_loss
+
+def CL_evaluate_model(model, data_loader, loss_function, device):
+    model.eval()
+
+    running_loss = 0.0
+    with torch.no_grad():  # Disable gradient computation
+        for i, (img1, img2) in enumerate(data_loader):
+            embeddings1 = model(img1.to(device) )
+            embeddings2 = model(img2.to(device) )
+
+            loss = loss_function(embeddings1, embeddings2)  # Calculate contrastive loss
+            running_loss += loss.item()
+
+    return running_loss
+    
 class InfoNCELoss(nn.Module):
     def __init__(self, temperature=1):
         super(InfoNCELoss, self).__init__()
@@ -64,7 +95,6 @@ class ContrastiveTransform:
         return img1, img2
 
 def RandomCrop_data(inputs):
-
     augmentation = transforms.Compose([
         transforms.ToPILImage(),
         transforms.RandomResizedCrop(size=224, scale=(0.8, 1.0)),
@@ -102,7 +132,6 @@ def CL_collate(batch):
     # Concatenate input data along the batch dimension
     augmented_inputs1 = RandomCrop_data(input_data_list)
     augmented_inputs2 = GaussBlur_data(input_data_list)
-
 
     return augmented_inputs1, augmented_inputs2
 
